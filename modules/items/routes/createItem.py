@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from modules.items.schema.schemas import WasteCreate, WasteResponse
-from modules.items.schema.models import WasteModel
+from modules.items.models import WasteModel 
 
 router = APIRouter(prefix="/waste", tags=["waste"])
 

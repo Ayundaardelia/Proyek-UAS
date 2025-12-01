@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
-from modules.items.schema.models import WasteModel
+from modules.items.models import WasteModel
+
 
 router = APIRouter(prefix="/waste", tags=["waste"])
 
