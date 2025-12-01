@@ -1,4 +1,4 @@
-City/District,Waste Type,Waste Generated (Tons/Day),Recycling Rate (%),Population Density (People/kmÂ²),Municipal Efficiency Score (1-10),Disposal Method,Cost of Waste Management (â‚¹/Ton),Awareness Campaigns Count,Landfill Name,"Landfill Location (Lat, Long)",Landfill Capacity (Tons),Year
+City_District,Waste_Type,Waste_Generated_Tons_Day,Recycling_Rate,Population_Density_People_km2,Municipal_Efficiency_Score,Disposal_Method,Cost_of_Waste_Management_Rs_Per_Ton,Awareness_Campaigns_Count,Landfill_Name,Landfill_Location_Lat_Long,Landfill_Capacity_Tons,Year
 Mumbai,Plastic,6610,68,11191,9,Composting,3056,14,Mumbai Landfill,"22.4265, 77.4931",45575,2019
 Mumbai,Organic,1181,56,11191,5,Composting,2778,12,Mumbai Landfill,"22.4265, 77.4931",45575,2019
 Mumbai,E-Waste,8162,53,11191,8,Incineration,3390,13,Mumbai Landfill,"22.4265, 77.4931",45575,2019
