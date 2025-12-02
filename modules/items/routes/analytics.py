@@ -1,18 +1,22 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List
 
 from database import get_db
-from modules.items.schema.models import WasteModel
+from modules.items.models import WasteModel
 from modules.items.schema import schemas
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
+def _safe_float(value) -> float:
+    """Konversi None ke 0.0, selain itu ke float biasa."""
+    return float(value or 0.0)
+
+
 # 1) Rata-rata volume sampah per kota
-@router.get("/avg-by-city", response_model=List[schemas.AvgWasteByCity])
-def avg_waste_by_city(db: Session = Depends(get_db)):
+@router.get("/avg-by-city", response_model=list[schemas.AvgWasteByCity])
+def avg_waste_by_city(db: Session = Depends(get_db)) -> list[schemas.AvgWasteByCity]:
     rows = (
         db.query(
             WasteModel.city_district.label("city_district"),
@@ -21,18 +25,19 @@ def avg_waste_by_city(db: Session = Depends(get_db)):
         .group_by(WasteModel.city_district)
         .all()
     )
+
     return [
         schemas.AvgWasteByCity(
-            city_district=r.city_district,
-            avg_waste_generated=r.avg_waste_generated or 0.0,
+            city_district=row.city_district,
+            avg_waste_generated=_safe_float(row.avg_waste_generated),
         )
-        for r in rows
+        for row in rows
     ]
 
 
 # 2) Rata-rata volume sampah per jenis sampah
-@router.get("/avg-by-type", response_model=List[schemas.AvgWasteByType])
-def avg_waste_by_type(db: Session = Depends(get_db)):
+@router.get("/avg-by-type", response_model=list[schemas.AvgWasteByType])
+def avg_waste_by_type(db: Session = Depends(get_db)) -> list[schemas.AvgWasteByType]:
     rows = (
         db.query(
             WasteModel.waste_type.label("waste_type"),
@@ -41,18 +46,22 @@ def avg_waste_by_type(db: Session = Depends(get_db)):
         .group_by(WasteModel.waste_type)
         .all()
     )
+
     return [
         schemas.AvgWasteByType(
-            waste_type=r.waste_type,
-            avg_waste_generated=r.avg_waste_generated or 0.0,
+            waste_type=row.waste_type,
+            avg_waste_generated=_safe_float(row.avg_waste_generated),
         )
-        for r in rows
+        for row in rows
     ]
 
 
 # 3) Kota dengan produksi sampah tertinggi (bisa top N)
-@router.get("/top-cities", response_model=List[schemas.TopCity])
-def top_cities(limit: int = 10, db: Session = Depends(get_db)):
+@router.get("/top-cities", response_model=list[schemas.TopCity])
+def top_cities(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+) -> list[schemas.TopCity]:
     rows = (
         db.query(
             WasteModel.city_district.label("city_district"),
@@ -63,26 +72,27 @@ def top_cities(limit: int = 10, db: Session = Depends(get_db)):
         .limit(limit)
         .all()
     )
+
     return [
         schemas.TopCity(
-            city_district=r.city_district,
-            total_waste_generated=r.total_waste_generated or 0.0,
+            city_district=row.city_district,
+            total_waste_generated=_safe_float(row.total_waste_generated),
         )
-        for r in rows
+        for row in rows
     ]
 
 
 # 4) Distribusi jenis sampah (total & persentase)
 @router.get(
     "/waste-type-distribution",
-    response_model=List[schemas.WasteTypeDistribution],
+    response_model=list[schemas.WasteTypeDistribution],
 )
-def waste_type_distribution(db: Session = Depends(get_db)):
-    # total semua sampah
-    total_all = (
-        db.query(func.sum(WasteModel.waste_generated))
-        .scalar()
-        or 0.0
+def waste_type_distribution(
+    db: Session = Depends(get_db),
+) -> list[schemas.WasteTypeDistribution]:
+    # total seluruh sampah
+    total_all = _safe_float(
+        db.query(func.sum(WasteModel.waste_generated)).scalar()
     )
 
     rows = (
@@ -94,15 +104,16 @@ def waste_type_distribution(db: Session = Depends(get_db)):
         .all()
     )
 
-    result = []
-    for r in rows:
-        total = r.total_waste_generated or 0.0
-        pct = (total / total_all * 100) if total_all > 0 else 0.0
+    result: list[schemas.WasteTypeDistribution] = []
+    for row in rows:
+        total = _safe_float(row.total_waste_generated)
+        percentage = (total / total_all * 100) if total_all > 0 else 0.0
+
         result.append(
             schemas.WasteTypeDistribution(
-                waste_type=r.waste_type,
+                waste_type=row.waste_type,
                 total_waste_generated=total,
-                percentage=pct,
+                percentage=percentage,
             )
         )
     return result

@@ -1,25 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from modules.items.schema.schemas import WasteUpdate, WasteOut
-from modules.items.transactions.models import WasteModel
-from database import SessionLocal
 
-router = APIRouter()
+from database import get_db
+from modules.items.schema.schemas import WasteUpdate, WasteResponse
+from modules.items.models import WasteModel
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+router = APIRouter(prefix="/waste", tags=["waste"])
 
-@router.put("/waste/{id}", response_model=WasteOut)
-def update_waste(id: int, payload: WasteUpdate, db: Session = Depends(get_db)):
+@router.put("/{id}", response_model=WasteResponse)
+def update_waste(id: int, item: WasteUpdate, db: Session = Depends(get_db)):
     data = db.query(WasteModel).filter(WasteModel.id == id).first()
     if not data:
-        raise HTTPException(404, "Data not found")
+        raise HTTPException(status_code=404, detail="Data tidak ditemukan")
 
-    update_data = payload.dict(exclude_unset=True)
+    update_data = item.dict(exclude_unset=True)
+
     for key, value in update_data.items():
         setattr(data, key, value)
 

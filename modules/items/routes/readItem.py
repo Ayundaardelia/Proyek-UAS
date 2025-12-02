@@ -1,25 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from modules.items.schema.schemas import WasteOut
-from modules.items.transactions.models import WasteModel
-from database import SessionLocal
+from typing import List
 
-router = APIRouter()
+from database import get_db
+from modules.items.schema.schemas import WasteResponse
+from modules.items.models import WasteModel
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+router = APIRouter(prefix="/waste", tags=["waste"])
 
-@router.get("/waste", response_model=list[WasteOut])
-def get_all_waste(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[WasteResponse])
+def get_all(db: Session = Depends(get_db)):
     return db.query(WasteModel).all()
 
-@router.get("/waste/{id}", response_model=WasteOut)
-def get_waste(id: int, db: Session = Depends(get_db)):
-    waste = db.query(WasteModel).filter(WasteModel.id == id).first()
-    if not waste:
-        raise HTTPException(404, "Data not found")
-    return waste
+@router.get("/{id}", response_model=WasteResponse)
+def get_one(id: int, db: Session = Depends(get_db)):
+    item = db.query(WasteModel).filter(WasteModel.id == id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Data tidak ditemukan")
+    return item

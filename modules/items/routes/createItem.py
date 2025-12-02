@@ -1,21 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from modules.items.schema.schemas import ItemCreate, ItemOut
-from modules.items.transactions.models import WasteModel
-from database import SessionLocal
 
-router = APIRouter()
+from database import get_db
+from modules.items.schema.schemas import WasteCreate, WasteResponse
+from modules.items.models import WasteModel 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+router = APIRouter(prefix="/waste", tags=["waste"])
 
-@router.post("/waste", response_model=WasteOut)
-def create_waste(data: WasteCreate, db: Session = Depends(get_db)):
-    db_item = WasteModel(**data.dict())
+@router.post("/", response_model=WasteResponse)
+def create_waste(item: WasteCreate, db: Session = Depends(get_db)):
+    db_item = WasteModel(**item.dict())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

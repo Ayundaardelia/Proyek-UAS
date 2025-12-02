@@ -1,23 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from modules.items.transactions.models import WasteModel
-from database import SessionLocal
 
-router = APIRouter()
+from database import get_db
+from modules.items.models import WasteModel
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-@router.delete("/waste/{id}")
+router = APIRouter(prefix="/waste", tags=["waste"])
+
+@router.delete("/{id}")
 def delete_waste(id: int, db: Session = Depends(get_db)):
     data = db.query(WasteModel).filter(WasteModel.id == id).first()
     if not data:
-        raise HTTPException(404, "Data not found")
+        raise HTTPException(status_code=404, detail="Data tidak ditemukan")
 
     db.delete(data)
     db.commit()
-    return {"message": "Data deleted successfully"}
+    return {"detail": "Data berhasil dihapus"}
