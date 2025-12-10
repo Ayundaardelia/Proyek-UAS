@@ -1,3 +1,1 @@
-# Cara RUN
-
-python main.py
+# Proyek-UAS
