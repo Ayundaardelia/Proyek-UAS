@@ -1,11 +1,11 @@
 # Proyek-UAS
 
-Repository ini dibuat untuk memenuhi proyek UAS yang dikerjakan secara berkelompok, dengan anggota kelompok
+Repository ini dibuat untuk memenuhi proyek UAS mata kuliah Kapita Selekta Analitika Data yang dikerjakan secara berkelompok, dengan anggota kelompok
 1. Angelica Farren Limzinky (6162201021)
 2. Ayunda Ardelia Syafira (6162201024)
 3. Michelle Alicia Adriana (6162201057)
 
-Sistem akan digunakan untuk mencatat volume dan jenis sampah di berbagai lokasi untuk memudahkan
+Sistem dibuat untuk mencatat volume dan jenis sampah di berbagai lokasi untuk memudahkan
 monitoring, identifikasi lokasi problematik, dan perencanaan pengumpulan sampah. Serta analisis data berdasarkan data yang dimiliki, antara lain:
 – Rata-rata volume sampah per lokasi dan per jenis sampah.
 – Tren volume sampah sepanjang waktu (harian/mingguan/bulanan).
